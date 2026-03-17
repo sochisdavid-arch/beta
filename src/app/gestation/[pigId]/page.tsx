@@ -30,6 +30,16 @@ import { useDoc, useMemoFirebase } from '@/firebase';
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
+function cleanUndefined<T extends Record<string, any>>(obj: T): T {
+    const clone: Record<string, any> = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        if (value !== undefined) {
+            clone[key] = value;
+        }
+    });
+    return clone as T;
+}
+
 export default function PigHistoryPage() {
     const router = useRouter();
     const params = useParams();
@@ -139,7 +149,7 @@ export default function PigHistoryPage() {
             }
 
             await updateDoc(pigRef, {
-                events: arrayUnion(baseEvent),
+                events: arrayUnion(cleanUndefined(baseEvent)),
                 lastEvent: { type: newEventType, date: isoDate },
             });
 
