@@ -11,7 +11,20 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import {
+    ArrowLeft,
+    Loader2,
+    Heart,
+    HeartHandshake,
+    Activity,
+    Stethoscope,
+    Syringe,
+    Baby,
+    TriangleAlert,
+    Ban,
+    DollarSign,
+    Skull,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useDoc, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -25,15 +38,19 @@ export default function PigHistoryPage() {
     
     const [farmId, setFarmId] = React.useState<string | null>(null);
     const [isAddEventOpen, setIsAddEventOpen] = React.useState(false);
-    const [newEventType, setNewEventType] = React.useState<string>("Observación");
+    const [newEventType, setNewEventType] = React.useState<string>("Inseminación");
     const [newEventDate, setNewEventDate] = React.useState<string>(() => new Date().toISOString().slice(0, 10));
     const [newEventDetails, setNewEventDetails] = React.useState<string>("");
-    const [newEventBoarId, setNewEventBoarId] = React.useState<string>("");
+    const [newEventTime, setNewEventTime] = React.useState<string>("");
+    const [newEventBoarId1, setNewEventBoarId1] = React.useState<string>("");
+    const [newEventBoarId2, setNewEventBoarId2] = React.useState<string>("");
+    const [newEventBoarId3, setNewEventBoarId3] = React.useState<string>("");
     const [newEventLiveBorn, setNewEventLiveBorn] = React.useState<string>("");
     const [newEventStillborn, setNewEventStillborn] = React.useState<string>("");
     const [newEventMummified, setNewEventMummified] = React.useState<string>("");
     const [newEventPigletCount, setNewEventPigletCount] = React.useState<string>("");
     const [newEventWeaningWeight, setNewEventWeaningWeight] = React.useState<string>("");
+    const [newEventAmount, setNewEventAmount] = React.useState<string>("");
     
     React.useEffect(() => {
         const stored = localStorage.getItem('farmInformation');
@@ -51,32 +68,56 @@ export default function PigHistoryPage() {
     if (isLoading) return <AppLayout><div className="flex justify-center p-20"><Loader2 className="animate-spin h-8 w-8 text-primary"/></div></AppLayout>;
     if (!pig) return <AppLayout><div className="p-20 text-center">Animal no encontrado.</div></AppLayout>;
 
+    const eventTypeOptions = [
+        { id: 'Inseminación', icon: Heart, label: 'Inseminación' },
+        { id: 'Monta Natural', icon: HeartHandshake, label: 'Monta Natural' },
+        { id: 'Celo', icon: Activity, label: 'Celo' },
+        { id: 'Tratamiento', icon: Stethoscope, label: 'Tratamiento' },
+        { id: 'Vacunación', icon: Syringe, label: 'Vacunación' },
+        { id: 'Parto', icon: Baby, label: 'Parto' },
+        { id: 'Aborto', icon: TriangleAlert, label: 'Aborto' },
+        { id: 'Descarte', icon: Ban, label: 'Descarte' },
+        { id: 'Venta', icon: DollarSign, label: 'Venta' },
+        { id: 'Muerte', icon: Skull, label: 'Muerte' },
+    ] as const;
+
+    const isBreedingEvent = newEventType === 'Inseminación' || newEventType === 'Monta Natural';
+
     const resetAddEventForm = () => {
-        setNewEventType("Observación");
+        setNewEventType("Inseminación");
         setNewEventDate(new Date().toISOString().slice(0, 10));
         setNewEventDetails("");
-        setNewEventBoarId("");
+        setNewEventTime("");
+        setNewEventBoarId1("");
+        setNewEventBoarId2("");
+        setNewEventBoarId3("");
         setNewEventLiveBorn("");
         setNewEventStillborn("");
         setNewEventMummified("");
         setNewEventPigletCount("");
         setNewEventWeaningWeight("");
+        setNewEventAmount("");
     };
 
     const handleAddEvent = (e: React.FormEvent) => {
         e.preventDefault();
         if (!pigRef) return;
 
-        const isoDate = new Date(`${newEventDate}T12:00:00`).toISOString();
+        const isoDate = new Date(`${newEventDate}T${newEventTime || '12:00'}:00`).toISOString();
         const baseEvent: any = {
             id: `evt-${Date.now()}`,
             type: newEventType,
             date: isoDate,
+            time: newEventTime || undefined,
             details: newEventDetails?.trim() || undefined,
         };
 
-        if (newEventType === 'Inseminación' || newEventType === 'Monta Natural') {
-            baseEvent.boarId = newEventBoarId?.trim() || undefined;
+        if (isBreedingEvent) {
+            baseEvent.boars = [
+                newEventBoarId1?.trim() || null,
+                newEventBoarId2?.trim() || null,
+                newEventBoarId3?.trim() || null,
+            ].filter(Boolean);
         }
 
         if (newEventType === 'Parto') {
@@ -88,6 +129,10 @@ export default function PigHistoryPage() {
         if (newEventType === 'Destete') {
             baseEvent.pigletCount = newEventPigletCount ? Number(newEventPigletCount) : 0;
             baseEvent.weaningWeight = newEventWeaningWeight ? Number(newEventWeaningWeight) : undefined;
+        }
+
+        if (newEventType === 'Venta') {
+            baseEvent.amount = newEventAmount ? Number(newEventAmount) : undefined;
         }
 
         const nextEvents = [...(pig.events || []), baseEvent];
@@ -133,7 +178,7 @@ export default function PigHistoryPage() {
                                 <div key={`${event.id}-${index}`} className="flex gap-4 p-3 border rounded-lg bg-muted/30">
                                     <div className="flex-grow">
                                         <p className="font-bold">{event.type}</p>
-                                        <p className="text-sm text-muted-foreground">{event.date}</p>
+                                        <p className="text-sm text-muted-foreground">{event.date}{event.time ? ` · ${event.time}` : ''}</p>
                                         <p className="text-sm mt-1">{event.details}</p>
                                     </div>
                                 </div>
@@ -155,32 +200,40 @@ export default function PigHistoryPage() {
             >
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Registrar evento</DialogTitle>
+                        <DialogTitle>Nuevo Evento</DialogTitle>
                         <DialogDescription>
-                            Agrega un evento a la hoja de vida del animal y guárdalo en la nube.
+                            Selecciona el tipo de evento y completa los campos.
                         </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleAddEvent} className="space-y-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="event-type">Tipo</Label>
-                            <select
-                                id="event-type"
-                                className="h-10 rounded-md border bg-background px-3 text-sm"
-                                value={newEventType}
-                                onChange={(ev) => setNewEventType(ev.target.value)}
-                            >
-                                <option value="Observación">Observación</option>
-                                <option value="Tratamiento">Tratamiento</option>
-                                <option value="Inseminación">Inseminación</option>
-                                <option value="Monta Natural">Monta Natural</option>
-                                <option value="Parto">Parto</option>
-                                <option value="Destete">Destete</option>
-                                <option value="Baja">Baja</option>
-                            </select>
+                            <Label>Tipo de Evento</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {eventTypeOptions.map((opt) => {
+                                    const Icon = opt.icon;
+                                    const active = newEventType === opt.id;
+                                    return (
+                                        <button
+                                            key={opt.id}
+                                            type="button"
+                                            onClick={() => setNewEventType(opt.id)}
+                                            className={[
+                                                "w-[84px] rounded-lg border px-2 py-2 text-left text-xs",
+                                                active ? "border-primary bg-primary/5" : "bg-background hover:bg-muted/40",
+                                            ].join(" ")}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <Icon className="h-4 w-4 text-primary" />
+                                            </div>
+                                            <div className="mt-1 font-medium">{opt.label}</div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="event-date">Fecha</Label>
+                            <Label htmlFor="event-date">Fecha del Evento</Label>
                             <Input
                                 id="event-date"
                                 type="date"
@@ -190,14 +243,74 @@ export default function PigHistoryPage() {
                             />
                         </div>
 
-                        {(newEventType === 'Inseminación' || newEventType === 'Monta Natural') && (
+                        {isBreedingEvent && (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="event-time">Hora *</Label>
+                                    <Input
+                                        id="event-time"
+                                        type="time"
+                                        placeholder="Ej: 08:30"
+                                        value={newEventTime}
+                                        onChange={(ev) => setNewEventTime(ev.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="event-boar-1">Macho 1 *</Label>
+                                    <Input
+                                        id="event-boar-1"
+                                        value={newEventBoarId1}
+                                        onChange={(ev) => setNewEventBoarId1(ev.target.value)}
+                                        placeholder="ID o código Macho 1"
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="event-boar-2">Macho 2 *</Label>
+                                    <Input
+                                        id="event-boar-2"
+                                        value={newEventBoarId2}
+                                        onChange={(ev) => setNewEventBoarId2(ev.target.value)}
+                                        placeholder="ID o código Macho 2"
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="event-boar-3">Macho 3 (Opcional)</Label>
+                                    <Input
+                                        id="event-boar-3"
+                                        value={newEventBoarId3}
+                                        onChange={(ev) => setNewEventBoarId3(ev.target.value)}
+                                        placeholder="ID o código Macho 3"
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {newEventType === 'Celo' && (
                             <div className="grid gap-2">
-                                <Label htmlFor="event-boar">ID Macho (opcional)</Label>
+                                <Label htmlFor="event-time">Hora *</Label>
                                 <Input
-                                    id="event-boar"
-                                    value={newEventBoarId}
-                                    onChange={(ev) => setNewEventBoarId(ev.target.value)}
-                                    placeholder="Ej: BOAR-001"
+                                    id="event-time"
+                                    type="time"
+                                    value={newEventTime}
+                                    onChange={(ev) => setNewEventTime(ev.target.value)}
+                                    required
+                                />
+                            </div>
+                        )}
+
+                        {newEventType === 'Venta' && (
+                            <div className="grid gap-2">
+                                <Label htmlFor="event-amount">Valor ($)</Label>
+                                <Input
+                                    id="event-amount"
+                                    type="number"
+                                    min={0}
+                                    step="0.01"
+                                    value={newEventAmount}
+                                    onChange={(ev) => setNewEventAmount(ev.target.value)}
                                 />
                             </div>
                         )}
@@ -215,19 +328,6 @@ export default function PigHistoryPage() {
                                 <div className="grid gap-2">
                                     <Label htmlFor="event-mummified">Momias</Label>
                                     <Input id="event-mummified" type="number" min={0} value={newEventMummified} onChange={(ev) => setNewEventMummified(ev.target.value)} />
-                                </div>
-                            </div>
-                        )}
-
-                        {newEventType === 'Destete' && (
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="event-piglets">Destetados</Label>
-                                    <Input id="event-piglets" type="number" min={0} value={newEventPigletCount} onChange={(ev) => setNewEventPigletCount(ev.target.value)} />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="event-weight">Peso destete (kg, opcional)</Label>
-                                    <Input id="event-weight" type="number" min={0} step="0.1" value={newEventWeaningWeight} onChange={(ev) => setNewEventWeaningWeight(ev.target.value)} />
                                 </div>
                             </div>
                         )}

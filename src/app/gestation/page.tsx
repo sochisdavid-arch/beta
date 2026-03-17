@@ -78,6 +78,7 @@ export default function GestationPage() {
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editingPig, setEditingPig] = React.useState<Pig | null>(null);
+  const [gender, setGender] = React.useState<'Hembra' | 'Macho'>('Hembra');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [pigToDelete, setPigToDelete] = React.useState<Pig | null>(null);
 
@@ -134,6 +135,11 @@ export default function GestationPage() {
     setIsFormOpen(false);
     setEditingPig(null);
   };
+
+  React.useEffect(() => {
+    if (!isFormOpen) return;
+    setGender((editingPig?.gender as 'Hembra' | 'Macho') || 'Hembra');
+  }, [isFormOpen, editingPig]);
 
   const handleDeleteConfirm = () => {
     if (pigToDelete && farmId && firestore) {
@@ -284,26 +290,25 @@ export default function GestationPage() {
               <form onSubmit={handleAnimalFormSubmit} className="grid gap-5 py-2">
                 <div className="space-y-2">
                   <Label>Género *</Label>
-                  <RadioGroup
-                    name="gender"
-                    defaultValue={editingPig?.gender || "Hembra"}
-                    className="grid grid-cols-2 gap-2"
-                  >
-                    <Label
-                      htmlFor="gender-hembra"
-                      className="flex h-10 items-center justify-center rounded-md border bg-background text-sm font-medium data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                  <input type="hidden" name="gender" value={gender} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant={gender === 'Hembra' ? 'default' : 'outline'}
+                      className="h-10"
+                      onClick={() => setGender('Hembra')}
                     >
-                      <RadioGroupItem id="gender-hembra" value="Hembra" className="sr-only" />
                       Hembra
-                    </Label>
-                    <Label
-                      htmlFor="gender-macho"
-                      className="flex h-10 items-center justify-center rounded-md border bg-background text-sm font-medium data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={gender === 'Macho' ? 'default' : 'outline'}
+                      className="h-10"
+                      onClick={() => setGender('Macho')}
                     >
-                      <RadioGroupItem id="gender-macho" value="Macho" className="sr-only" />
                       Macho
-                    </Label>
-                  </RadioGroup>
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
