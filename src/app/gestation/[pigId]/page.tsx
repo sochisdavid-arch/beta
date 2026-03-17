@@ -198,7 +198,7 @@ export default function PigHistoryPage() {
                     if (!open) resetAddEventForm();
                 }}
             >
-                <DialogContent>
+                <DialogContent className="max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Nuevo Evento</DialogTitle>
                         <DialogDescription>
