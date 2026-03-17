@@ -10,8 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Filter, Search, PlusCircle, MoreHorizontal, X, Wheat, Users, HeartPulse, Wind, Loader2 } from 'lucide-react';
+import { Filter, Search, PlusCircle, MoreHorizontal, Loader2, RefreshCw } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -92,6 +91,15 @@ export default function GestationPage() {
     return temp;
   }, [pigs, filterId, filterBreed]);
 
+  const kpis = React.useMemo(() => {
+    const source = filteredPigs;
+    return {
+      gestantes: source.filter(p => p.status === 'Gestante').length,
+      vacias: source.filter(p => p.status === 'Vacia').length,
+      reemplazos: source.filter(p => p.status === 'Remplazo').length,
+    };
+  }, [filteredPigs]);
+
   const handleAnimalFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!farmId || !firestore || !user) return;
@@ -139,57 +147,130 @@ export default function GestationPage() {
   return (
     <AppLayout>
       <div className="flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de Animales (Nube)</h1>
-          <Button onClick={() => { setEditingPig(null); setIsFormOpen(true); }}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Añadir Animal
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Panel Gestación</h1>
+            <p className="text-sm text-muted-foreground">Control de hembras y nutrición</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => window.location.reload()}
+            className="gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Cargar
           </Button>
         </div>
 
         <Card>
-          <CardHeader>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  <Input placeholder="Buscar por ID..." value={filterId} onChange={(e) => setFilterId(e.target.value)} />
-                  <Select value={filterBreed} onValueChange={setFilterBreed}>
-                      <SelectTrigger><SelectValue placeholder="Raza" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas</SelectItem>
-                        {pigBreeds.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                      </SelectContent>
-                  </Select>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="rounded-lg border bg-background p-4">
+                <p className="text-xs font-semibold text-muted-foreground">GESTANTES</p>
+                <p className="mt-2 text-2xl font-bold">{kpis.gestantes}</p>
+                <p className="text-xs text-muted-foreground">Activas</p>
               </div>
-          </CardHeader>
-          <CardContent>
-              <Table>
-                <TableHeader>
-                    <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Raza</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {filteredPigs.map((pig) => (
-                    <TableRow key={pig.id} onClick={() => router.push(`/gestation/${pig.id}`)} className="cursor-pointer">
-                        <TableCell className="font-medium">{pig.id}</TableCell>
-                        <TableCell><Badge variant="outline">{pig.status}</Badge></TableCell>
-                        <TableCell>{pig.breed}</TableCell>
-                        <TableCell className="text-right">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                    <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onSelect={() => { setEditingPig(pig); setIsFormOpen(true); }}>Editar</DropdownMenuItem>
-                                  <DropdownMenuItem onSelect={() => { setPigToDelete(pig); setIsDeleteDialogOpen(true); }} className="text-red-500">Eliminar</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </TableCell>
-                    </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
+              <div className="rounded-lg border-2 border-red-300 bg-background p-4">
+                <p className="text-xs font-semibold text-muted-foreground">VACÍAS</p>
+                <p className="mt-2 text-2xl font-bold">{kpis.vacias}</p>
+                <p className="text-xs text-muted-foreground">Servicio</p>
+              </div>
+              <div className="rounded-lg border bg-background p-4">
+                <p className="text-xs font-semibold text-muted-foreground">REEMPLAZOS</p>
+                <p className="mt-2 text-2xl font-bold">{kpis.reemplazos}</p>
+                <p className="text-xs text-muted-foreground">Cría</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <Button
+            className="h-12 w-full bg-blue-600 hover:bg-blue-700"
+            onClick={() => { setEditingPig(null); setIsFormOpen(true); }}
+          >
+            <PlusCircle className="mr-2 h-5 w-5" />
+            Añadir Animal
+          </Button>
+          <Button
+            className="h-12 w-full bg-orange-500 hover:bg-orange-600"
+            onClick={() => router.push('/forms/templates/consumo-alimento')}
+          >
+            Consumo
+          </Button>
+        </div>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="ID / Chapeta"
+                  value={filterId}
+                  onChange={(e) => setFilterId(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <div className="relative">
+                <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Select value={filterBreed} onValueChange={setFilterBreed}>
+                  <SelectTrigger className="pl-9">
+                    <SelectValue placeholder="Raza" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    {pigBreeds.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              {filteredPigs.length === 0 ? (
+                <div className="py-10 text-center text-sm text-muted-foreground">
+                  Sin resultados
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {filteredPigs.map((pig) => (
+                    <div
+                      key={pig.id}
+                      onClick={() => router.push(`/gestation/${pig.id}`)}
+                      className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border bg-background p-4 hover:bg-muted/40"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold">{pig.id}</p>
+                        <p className="text-sm text-muted-foreground">{pig.breed}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="hidden sm:block">
+                          <span className="rounded-md border px-2 py-1 text-xs">{pig.status}</span>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="icon" aria-label="Acciones">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => { setEditingPig(pig); setIsFormOpen(true); }}>
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => { setPigToDelete(pig); setIsDeleteDialogOpen(true); }}
+                              className="text-red-500"
+                            >
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
