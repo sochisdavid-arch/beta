@@ -26,8 +26,8 @@ import {
     Skull,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useDoc, useUser, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useDoc, useMemoFirebase } from '@/firebase';
+import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function PigHistoryPage() {
@@ -51,6 +51,7 @@ export default function PigHistoryPage() {
     const [newEventPigletCount, setNewEventPigletCount] = React.useState<string>("");
     const [newEventWeaningWeight, setNewEventWeaningWeight] = React.useState<string>("");
     const [newEventAmount, setNewEventAmount] = React.useState<string>("");
+    const [isSavingEvent, setIsSavingEvent] = React.useState(false);
     
     React.useEffect(() => {
         const stored = localStorage.getItem('farmInformation');
@@ -99,51 +100,62 @@ export default function PigHistoryPage() {
         setNewEventAmount("");
     };
 
-    const handleAddEvent = (e: React.FormEvent) => {
+    const handleAddEvent = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!pigRef) return;
+        setIsSavingEvent(true);
 
-        const isoDate = new Date(`${newEventDate}T${newEventTime || '12:00'}:00`).toISOString();
-        const baseEvent: any = {
-            id: `evt-${Date.now()}`,
-            type: newEventType,
-            date: isoDate,
-            time: newEventTime || undefined,
-            details: newEventDetails?.trim() || undefined,
-        };
+        try {
+            const isoDate = new Date(`${newEventDate}T${newEventTime || '12:00'}:00`).toISOString();
+            const baseEvent: any = {
+                id: `evt-${Date.now()}`,
+                type: newEventType,
+                date: isoDate,
+                time: newEventTime || undefined,
+                details: newEventDetails?.trim() || undefined,
+            };
 
-        if (isBreedingEvent) {
-            baseEvent.boars = [
-                newEventBoarId1?.trim() || null,
-                newEventBoarId2?.trim() || null,
-                newEventBoarId3?.trim() || null,
-            ].filter(Boolean);
+            if (isBreedingEvent) {
+                baseEvent.boars = [
+                    newEventBoarId1?.trim() || null,
+                    newEventBoarId2?.trim() || null,
+                    newEventBoarId3?.trim() || null,
+                ].filter(Boolean);
+            }
+
+            if (newEventType === 'Parto') {
+                baseEvent.liveBorn = newEventLiveBorn ? Number(newEventLiveBorn) : 0;
+                baseEvent.stillborn = newEventStillborn ? Number(newEventStillborn) : 0;
+                baseEvent.mummified = newEventMummified ? Number(newEventMummified) : 0;
+            }
+
+            if (newEventType === 'Destete') {
+                baseEvent.pigletCount = newEventPigletCount ? Number(newEventPigletCount) : 0;
+                baseEvent.weaningWeight = newEventWeaningWeight ? Number(newEventWeaningWeight) : undefined;
+            }
+
+            if (newEventType === 'Venta') {
+                baseEvent.amount = newEventAmount ? Number(newEventAmount) : undefined;
+            }
+
+            await updateDoc(pigRef, {
+                events: arrayUnion(baseEvent),
+                lastEvent: { type: newEventType, date: isoDate },
+            });
+
+            toast({ title: "Evento registrado", description: "Se guardó correctamente." });
+            setIsAddEventOpen(false);
+            resetAddEventForm();
+        } catch (error) {
+            console.error('Error saving event:', error);
+            toast({
+                variant: 'destructive',
+                title: 'No se pudo guardar',
+                description: 'Revisa permisos/reglas de Firestore o tu conexión e inténtalo de nuevo.',
+            });
+        } finally {
+            setIsSavingEvent(false);
         }
-
-        if (newEventType === 'Parto') {
-            baseEvent.liveBorn = newEventLiveBorn ? Number(newEventLiveBorn) : 0;
-            baseEvent.stillborn = newEventStillborn ? Number(newEventStillborn) : 0;
-            baseEvent.mummified = newEventMummified ? Number(newEventMummified) : 0;
-        }
-
-        if (newEventType === 'Destete') {
-            baseEvent.pigletCount = newEventPigletCount ? Number(newEventPigletCount) : 0;
-            baseEvent.weaningWeight = newEventWeaningWeight ? Number(newEventWeaningWeight) : undefined;
-        }
-
-        if (newEventType === 'Venta') {
-            baseEvent.amount = newEventAmount ? Number(newEventAmount) : undefined;
-        }
-
-        const nextEvents = [...(pig.events || []), baseEvent];
-        updateDocumentNonBlocking(pigRef, {
-            events: nextEvents,
-            lastEvent: { type: newEventType, date: isoDate },
-        });
-
-        toast({ title: "Evento registrado", description: "El evento se guardó en la nube." });
-        setIsAddEventOpen(false);
-        resetAddEventForm();
     };
 
     return (
@@ -344,7 +356,9 @@ export default function PigHistoryPage() {
 
                         <DialogFooter>
                             <Button type="button" variant="ghost" onClick={() => setIsAddEventOpen(false)}>Cancelar</Button>
-                            <Button type="submit">Guardar evento</Button>
+                            <Button type="submit" disabled={isSavingEvent}>
+                                {isSavingEvent ? 'Guardando...' : 'Guardar evento'}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
