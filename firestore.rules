@@ -1,0 +1,141 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * SMARTPIG LITE SECURITY RULES
+     *
+     * Core Philosophy:
+     * This ruleset implements a dual-layer security model:
+     * 1. Path-Based Ownership: Users have exclusive access to their own profile and subscriptions
+     *    stored under /users/{userId}.
+     * 2. Role-Based Shared Access: Farm data is shared among authorized members. To optimize performance
+     *    and avoid costly get() calls, authorization data (the 'members' map) is denormalized
+     *    directly onto every document within the /farms/{farmId} hierarchy.
+     *
+     * Data Structure:
+     * - /users/{userId}: Private user profiles and associated farm references.
+     * - /farms/{farmId}: Top-level farm documents containing membership and role information.
+     * - /farms/{farmId}/{collection}/{docId}: Entity-specific data (Sows, Pigs, Events) that
+     *   inherits security from the farm's membership list via denormalization.
+     *
+     * Key Security Decisions:
+     * - Authorization Independence: All farm sub-entities must contain a 'members' map mirroring
+     *   the parent farm's access list to enable fast, single-document authorization.
+     * - Relational Integrity: Rules enforce that the 'farmId' field within a document matches
+     *   the 'farmId' present in the document's path.
+     * - Prototyping Flexibility: Data types and full schema shapes are not enforced, allowing
+     *   developers to iterate quickly on entity properties.
+     */
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** Checks if the request is from a signed-in user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user matches the provided userId (Path-based ownership). */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks if the user is the owner of an existing document. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /**
+     * Checks if the user is a member of the farm based on a members map.
+     * members map format: { "UID": "role" }
+     */
+    function isMember(membersMap) {
+      return isSignedIn() && membersMap != null && membersMap[request.auth.uid] != null;
+    }
+
+    /** Checks if the user has an 'admin' or 'owner' role in the farm. */
+    function isAdminMember(membersMap) {
+      return isSignedIn() && membersMap != null && (membersMap[request.auth.uid] == 'admin' || membersMap[request.auth.uid] == 'owner');
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for user profiles. Users can manage their own profile data.
+     * @path /users/{userId}
+     * @allow (get) If the user is the owner (UID matches path).
+     * @deny (create) If the UID in the path does not match the authenticated user.
+     * @principle Enforces path-based ownership for private user profiles.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Rules for user subscriptions. Only the user can access their subscription history.
+       * @path /users/{userId}/subscriptions/{subscriptionId}
+       * @allow (list) If the authenticated user is the parent userId.
+       * @deny (get) If the user attempts to read another user's subscription.
+       * @principle Hierarchical path-based security for private user-owned data.
+       */
+      match /subscriptions/{subscriptionId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update: if isExistingOwner(userId);
+        allow delete: if false; // Subscriptions are typically permanent records
+      }
+    }
+
+    /**
+     * @description Top-level farm documents. Controlled via a denormalized 'members' map.
+     * @path /farms/{farmId}
+     * @allow (update) If user is an 'admin' or 'owner' in the members map.
+     * @deny (create) If the user doesn't include themselves as an 'owner' in the new document.
+     * @principle Shared access model using a member UID map for authorization.
+     */
+    match /farms/{farmId} {
+      allow get: if isMember(resource.data.members);
+      allow list: if isSignedIn(); // Queries must filter by members[uid]
+      allow create: if isSignedIn() && request.resource.data.members[request.auth.uid] == 'owner';
+      allow update: if resource != null && isAdminMember(resource.data.members);
+      allow delete: if resource != null && resource.data.members[request.auth.uid] == 'owner';
+
+      // --- FARM SUBCOLLECTIONS ---
+      // These rules apply to all subcollections: sows, boars, pigs, batches, facilities, events, etc.
+      // They rely on the denormalized 'members' map for Authorization Independence.
+
+      match /{collection}/{docId} {
+
+        /**
+         * @description Generic rule for farm-owned entities (Sows, Pigs, Events, Inventory, etc.).
+         * @path /farms/{farmId}/{collection}/{docId}
+         * @allow (create) If the user is a member and the document's farmId matches the path.
+         * @deny (update) If the user attempts to move the document to a different farmId.
+         * @principle Authorization Independence via denormalized membership data and path consistency.
+         */
+
+        allow get: if isMember(resource.data.members);
+
+        allow list: if isSignedIn(); // Client must filter by farmId or members map
+
+        allow create: if isSignedIn()
+          && isMember(request.resource.data.members)
+          && request.resource.data.farmId == farmId;
+
+        allow update: if resource != null
+          && isMember(resource.data.members)
+          && request.resource.data.farmId == resource.data.farmId;
+
+        allow delete: if resource != null
+          && isAdminMember(resource.data.members);
+      }
+    }
+
+    // Default deny for any unmatched paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

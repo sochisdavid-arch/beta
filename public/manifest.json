@@ -1,0 +1,25 @@
+
+{
+  "name": "SmartPig Lite",
+  "short_name": "SmartPig",
+  "description": "Gestión Porcina Profesional en la Nube",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://placehold.co/192x192.png?text=SmartPig",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://placehold.co/512x512.png?text=SmartPig",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

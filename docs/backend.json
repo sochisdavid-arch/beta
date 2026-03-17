@@ -1,0 +1,1469 @@
+{
+  "entities": {
+    "Farm": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Farm",
+      "type": "object",
+      "description": "Represents a single farm managed by the SmartPig application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Farm entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the farm."
+        },
+        "location": {
+          "type": "string",
+          "description": "Geographical location of the farm."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the farm."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The primary currency used for financial transactions on this farm (e.g., 'USD', 'EUR')."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "location",
+        "currency"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account with access to the SmartPig application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for login.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role, defining their permissions within the application.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the primary Farm this user is associated with. (Relationship: Farm 1:N User)"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "role",
+        "farmId"
+      ]
+    },
+    "Sow": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Sow",
+      "type": "object",
+      "description": "Represents an individual female pig managed for breeding purposes.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Sow entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this sow belongs to. (Relationship: Farm 1:N Sow)"
+        },
+        "earTag": {
+          "type": "string",
+          "description": "The unique ear tag or identification number for the sow within the farm."
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "The date of birth of the sow.",
+          "format": "date-time"
+        },
+        "breed": {
+          "type": "string",
+          "description": "The breed of the sow."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current reproductive or general status of the sow (e.g., gestating, lactating, open, culled, died)."
+        },
+        "parity": {
+          "type": "number",
+          "description": "The number of times the sow has farrowed (given birth)."
+        },
+        "entryDate": {
+          "type": "string",
+          "description": "The date the sow entered the farm or the management system.",
+          "format": "date-time"
+        },
+        "exitDate": {
+          "type": "string",
+          "description": "The date the sow left the farm (e.g., culled, sold, died).",
+          "format": "date-time"
+        },
+        "reasonForExit": {
+          "type": "string",
+          "description": "The reason for the sow's departure from the farm (e.g., culling, sale, death)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the sow."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "earTag",
+        "birthDate",
+        "breed",
+        "status",
+        "parity",
+        "entryDate"
+      ]
+    },
+    "Boar": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Boar",
+      "type": "object",
+      "description": "Represents an individual male pig managed for breeding purposes.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Boar entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this boar belongs to. (Relationship: Farm 1:N Boar)"
+        },
+        "earTag": {
+          "type": "string",
+          "description": "The unique ear tag or identification number for the boar within the farm."
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "The date of birth of the boar.",
+          "format": "date-time"
+        },
+        "breed": {
+          "type": "string",
+          "description": "The breed of the boar."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current breeding or general status of the boar (e.g., active, retired, culled, died)."
+        },
+        "entryDate": {
+          "type": "string",
+          "description": "The date the boar entered the farm or the management system.",
+          "format": "date-time"
+        },
+        "exitDate": {
+          "type": "string",
+          "description": "The date the boar left the farm (e.g., culled, sold, died).",
+          "format": "date-time"
+        },
+        "reasonForExit": {
+          "type": "string",
+          "description": "The reason for the boar's departure from the farm (e.g., culling, sale, death)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the boar."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "earTag",
+        "birthDate",
+        "breed",
+        "status",
+        "entryDate"
+      ]
+    },
+    "Pig": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Pig",
+      "type": "object",
+      "description": "Represents a general pig, used for tracking individual piglets, growing pigs, or finisher pigs.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Pig entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this pig belongs to. (Relationship: Farm 1:N Pig)"
+        },
+        "earTag": {
+          "type": "string",
+          "description": "Optional unique ear tag or identification number for the pig. Only used for individual tracking."
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "The date of birth of the pig.",
+          "format": "date-time"
+        },
+        "sex": {
+          "type": "string",
+          "description": "The sex of the pig (e.g., male, female, castrated)."
+        },
+        "breed": {
+          "type": "string",
+          "description": "The breed of the pig."
+        },
+        "currentWeightKg": {
+          "type": "number",
+          "description": "The most recently recorded weight of the pig in kilograms."
+        },
+        "stage": {
+          "type": "string",
+          "description": "The current life stage of the pig (e.g., piglet, nursery, grower, finisher)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the pig (e.g., active, sold, died, culled, transferred)."
+        },
+        "currentBatchId": {
+          "type": "string",
+          "description": "Reference to the Batch this pig is currently part of. (Relationship: Batch 1:N Pig)"
+        },
+        "currentFacilityId": {
+          "type": "string",
+          "description": "Reference to the Facility where the pig is currently housed. (Relationship: Facility 1:N Pig)"
+        },
+        "sowMotherId": {
+          "type": "string",
+          "description": "Reference to the Sow that is the mother of this pig. (Relationship: Sow 1:N Pig)"
+        },
+        "boarFatherId": {
+          "type": "string",
+          "description": "Reference to the Boar that is the father of this pig. (Relationship: Boar 1:N Pig)"
+        },
+        "entryDate": {
+          "type": "string",
+          "description": "The date the pig entered its current stage or batch.",
+          "format": "date-time"
+        },
+        "exitDate": {
+          "type": "string",
+          "description": "The date the pig left its current stage/batch or the farm (e.g., sold, died, transferred).",
+          "format": "date-time"
+        },
+        "reasonForExit": {
+          "type": "string",
+          "description": "The reason for the pig's departure from the farm or current stage."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the pig."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "birthDate",
+        "sex",
+        "stage",
+        "status",
+        "currentFacilityId",
+        "entryDate"
+      ]
+    },
+    "Batch": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Batch",
+      "type": "object",
+      "description": "Represents a group of pigs managed together for tracking growth and finishing stages.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Batch entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this batch belongs to. (Relationship: Farm 1:N Batch)"
+        },
+        "name": {
+          "type": "string",
+          "description": "A descriptive name for the batch (e.g., 'Batch 2023-Q4-Nursery')."
+        },
+        "stage": {
+          "type": "string",
+          "description": "The current life stage of the pigs in the batch (e.g., nursery, grower, finisher, weaned, mixed)."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date the batch was started or formed.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date the batch was completed, sold, or dissolved.",
+          "format": "date-time"
+        },
+        "startQuantity": {
+          "type": "number",
+          "description": "The initial number of pigs in the batch."
+        },
+        "currentQuantity": {
+          "type": "number",
+          "description": "The current number of pigs in the batch."
+        },
+        "initialAverageWeightKg": {
+          "type": "number",
+          "description": "The average weight of pigs in the batch when it started, in kilograms."
+        },
+        "currentAverageWeightKg": {
+          "type": "number",
+          "description": "The most recently recorded average weight of pigs in the batch, in kilograms."
+        },
+        "facilityId": {
+          "type": "string",
+          "description": "Reference to the Facility where the batch is currently housed. (Relationship: Facility 1:N Batch)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the batch."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "name",
+        "stage",
+        "startDate",
+        "startQuantity",
+        "currentQuantity",
+        "initialAverageWeightKg",
+        "facilityId"
+      ]
+    },
+    "Facility": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Facility",
+      "type": "object",
+      "description": "Represents a physical location or area within the farm, such as a barn, room, or pen.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Facility entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this facility belongs to. (Relationship: Farm 1:N Facility)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the facility (e.g., 'Barn 1', 'Maternity Room A', 'Pen 10')."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of facility (e.g., barn, maternity, nursery, grower, finisher, quarantine, boar pen)."
+        },
+        "capacity": {
+          "type": "number",
+          "description": "The maximum capacity of animals this facility can hold."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the facility (e.g., occupied, vacant, under cleaning, maintenance)."
+        },
+        "lastCleanedDate": {
+          "type": "string",
+          "description": "The date when the facility was last cleaned and disinfected.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the facility."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "name",
+        "type",
+        "capacity",
+        "status"
+      ]
+    },
+    "MatingEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MatingEvent",
+      "type": "object",
+      "description": "Records an event where a sow is serviced or mated.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MatingEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N MatingEvent)"
+        },
+        "sowId": {
+          "type": "string",
+          "description": "Reference to the Sow involved in the mating event. (Relationship: Sow 1:N MatingEvent)"
+        },
+        "matingDate": {
+          "type": "string",
+          "description": "The date and time of the mating event.",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of mating (e.g., natural, AI - Artificial Insemination)."
+        },
+        "boarId": {
+          "type": "string",
+          "description": "Reference to the Boar involved in the mating event, if natural mating. (Relationship: Boar 1:N MatingEvent)"
+        },
+        "semenBatchInventoryItemId": {
+          "type": "string",
+          "description": "Reference to the InventoryItem representing the semen batch used, if AI. (Relationship: InventoryItem 1:N MatingEvent)"
+        },
+        "technicianUserId": {
+          "type": "string",
+          "description": "Reference to the User who performed the mating event. (Relationship: User 1:N MatingEvent)"
+        },
+        "pregnancyConfirmed": {
+          "type": "boolean",
+          "description": "Indicates if pregnancy was confirmed after the mating event."
+        },
+        "pregnancyConfirmationDate": {
+          "type": "string",
+          "description": "The date when pregnancy was confirmed.",
+          "format": "date-time"
+        },
+        "expectedFarrowingDate": {
+          "type": "string",
+          "description": "The calculated expected date for farrowing.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the mating event."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "sowId",
+        "matingDate",
+        "type"
+      ]
+    },
+    "FarrowingEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FarrowingEvent",
+      "type": "object",
+      "description": "Records details of a sow's farrowing (birth) event.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FarrowingEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N FarrowingEvent)"
+        },
+        "sowId": {
+          "type": "string",
+          "description": "Reference to the Sow that farrowed. (Relationship: Sow 1:N FarrowingEvent)"
+        },
+        "matingEventId": {
+          "type": "string",
+          "description": "Reference to the MatingEvent that resulted in this farrowing. (Relationship: MatingEvent 1:N FarrowingEvent)"
+        },
+        "farrowingDate": {
+          "type": "string",
+          "description": "The date and time of the farrowing event.",
+          "format": "date-time"
+        },
+        "liveBorn": {
+          "type": "number",
+          "description": "The number of piglets born alive."
+        },
+        "stillBorn": {
+          "type": "number",
+          "description": "The number of piglets born dead."
+        },
+        "mummified": {
+          "type": "number",
+          "description": "The number of mummified fetuses born."
+        },
+        "totalBorn": {
+          "type": "number",
+          "description": "The total number of piglets born (live, stillborn, mummified)."
+        },
+        "birthWeightAverageKg": {
+          "type": "number",
+          "description": "The average birth weight of the live-born piglets in kilograms."
+        },
+        "litterQualityScore": {
+          "type": "number",
+          "description": "A score indicating the overall quality of the litter (e.g., based on uniformity, vitality)."
+        },
+        "attendedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who attended or recorded the farrowing event. (Relationship: User 1:N FarrowingEvent)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the farrowing event or litter."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "sowId",
+        "matingEventId",
+        "farrowingDate",
+        "liveBorn",
+        "stillBorn",
+        "mummified",
+        "totalBorn"
+      ]
+    },
+    "WeaningEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WeaningEvent",
+      "type": "object",
+      "description": "Records details of a weaning event, when piglets are separated from the sow.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WeaningEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N WeaningEvent)"
+        },
+        "sowId": {
+          "type": "string",
+          "description": "Reference to the Sow from which the piglets were weaned. (Relationship: Sow 1:N WeaningEvent)"
+        },
+        "farrowingEventId": {
+          "type": "string",
+          "description": "Reference to the FarrowingEvent that produced the piglets being weaned. (Relationship: FarrowingEvent 1:N WeaningEvent)"
+        },
+        "weaningDate": {
+          "type": "string",
+          "description": "The date and time of the weaning event.",
+          "format": "date-time"
+        },
+        "weanedQuantity": {
+          "type": "number",
+          "description": "The number of piglets successfully weaned."
+        },
+        "weaningAverageWeightKg": {
+          "type": "number",
+          "description": "The average weight of the weaned piglets in kilograms."
+        },
+        "destinationBatchId": {
+          "type": "string",
+          "description": "Reference to the Batch where the weaned piglets were moved. (Relationship: Batch 1:N WeaningEvent)"
+        },
+        "destinationFacilityId": {
+          "type": "string",
+          "description": "Reference to the Facility where the weaned piglets were moved. (Relationship: Facility 1:N WeaningEvent)"
+        },
+        "performedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who performed or recorded the weaning event. (Relationship: User 1:N WeaningEvent)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the weaning event."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "sowId",
+        "farrowingEventId",
+        "weaningDate",
+        "weanedQuantity"
+      ]
+    },
+    "HealthEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HealthEvent",
+      "type": "object",
+      "description": "Records a health-related event for an animal or group, such as vaccination, treatment, or illness.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the HealthEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N HealthEvent)"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The type of entity this health event applies to (e.g., pig, sow, boar, batch)."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Reference to the specific entity (Sow, Boar, Pig, or Batch) this event applies to. (Relationship: Generic Entity 1:N HealthEvent)"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "The specific type of health event (e.g., vaccination, treatment, illness, diagnosis, protocol application)."
+        },
+        "eventDate": {
+          "type": "string",
+          "description": "The date and time the health event occurred.",
+          "format": "date-time"
+        },
+        "medicationInventoryItemId": {
+          "type": "string",
+          "description": "Reference to the InventoryItem representing the medication used, if applicable. (Relationship: InventoryItem 1:N HealthEvent)"
+        },
+        "dosage": {
+          "type": "string",
+          "description": "The dosage of medication administered."
+        },
+        "diagnosis": {
+          "type": "string",
+          "description": "The diagnosis for an illness event."
+        },
+        "symptoms": {
+          "type": "string",
+          "description": "A description of observed symptoms."
+        },
+        "treatmentDescription": {
+          "type": "string",
+          "description": "A description of the treatment administered."
+        },
+        "performedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who performed or recorded the health event. (Relationship: User 1:N HealthEvent)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the health event."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "entityType",
+        "entityId",
+        "eventType",
+        "eventDate"
+      ]
+    },
+    "FeedingEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FeedingEvent",
+      "type": "object",
+      "description": "Records an instance of feed consumption for an animal or group.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FeedingEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N FeedingEvent)"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The type of entity this feeding event applies to (e.g., pig, sow, boar, batch)."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Reference to the specific entity (Sow, Boar, Pig, or Batch) this event applies to. (Relationship: Generic Entity 1:N FeedingEvent)"
+        },
+        "feedingDate": {
+          "type": "string",
+          "description": "The date and time the feed was consumed.",
+          "format": "date-time"
+        },
+        "feedTypeId": {
+          "type": "string",
+          "description": "Reference to the FeedType that was consumed. (Relationship: FeedType 1:N FeedingEvent)"
+        },
+        "quantityKg": {
+          "type": "number",
+          "description": "The quantity of feed consumed in kilograms."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the feeding event."
+        },
+        "recordedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who recorded the feeding event. (Relationship: User 1:N FeedingEvent)"
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "entityType",
+        "entityId",
+        "feedingDate",
+        "feedTypeId",
+        "quantityKg"
+      ]
+    },
+    "FeedType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FeedType",
+      "type": "object",
+      "description": "Defines different types of feed used on the farm.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FeedType entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this feed type is available at. (Relationship: Farm 1:N FeedType)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the feed type (e.g., 'Pre-starter', 'Grower 1', 'Lactation Feed')."
+        },
+        "stage": {
+          "type": "string",
+          "description": "The life stage of pigs for which this feed type is intended (e.g., pre-starter, starter, growth, finisher, lactation, gestation, boar)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the feed type, including ingredients or specific uses."
+        },
+        "proteinContentPercentage": {
+          "type": "number",
+          "description": "The protein content percentage of the feed."
+        },
+        "energyContentKcalKg": {
+          "type": "number",
+          "description": "The energy content of the feed in Kcal per kilogram."
+        },
+        "costPerKg": {
+          "type": "number",
+          "description": "The cost of this feed type per kilogram."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the feed type."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "name",
+        "stage"
+      ]
+    },
+    "WeightEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WeightEvent",
+      "type": "object",
+      "description": "Records a weight measurement for an individual animal or a batch.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WeightEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N WeightEvent)"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The type of entity this weight event applies to (e.g., pig, sow, boar, batch)."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Reference to the specific entity (Sow, Boar, Pig, or Batch) this event applies to. (Relationship: Generic Entity 1:N WeightEvent)"
+        },
+        "measurementDate": {
+          "type": "string",
+          "description": "The date and time the weight was measured.",
+          "format": "date-time"
+        },
+        "weightKg": {
+          "type": "number",
+          "description": "The measured weight in kilograms."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the weight measurement."
+        },
+        "recordedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who recorded the weight event. (Relationship: User 1:N WeightEvent)"
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "entityType",
+        "entityId",
+        "measurementDate",
+        "weightKg"
+      ]
+    },
+    "MovementEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MovementEvent",
+      "type": "object",
+      "description": "Records the transfer, sale, death, or culling of an animal or batch.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MovementEvent entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm where this event occurred. (Relationship: Farm 1:N MovementEvent)"
+        },
+        "entityType": {
+          "type": "string",
+          "description": "The type of entity this movement event applies to (e.g., pig, sow, boar, batch)."
+        },
+        "entityId": {
+          "type": "string",
+          "description": "Reference to the specific entity (Sow, Boar, Pig, or Batch) that moved. (Relationship: Generic Entity 1:N MovementEvent)"
+        },
+        "movementDate": {
+          "type": "string",
+          "description": "The date and time of the movement event.",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of movement (e.g., transfer, sale, death, cull, birth)."
+        },
+        "fromFacilityId": {
+          "type": "string",
+          "description": "Reference to the Facility from which the entity moved. (Relationship: Facility 1:N MovementEvent)"
+        },
+        "toFacilityId": {
+          "type": "string",
+          "description": "Reference to the Facility to which the entity moved. (Relationship: Facility 1:N MovementEvent)"
+        },
+        "destinationDetails": {
+          "type": "string",
+          "description": "Details about the external destination if applicable (e.g., 'slaughterhouse XYZ', 'another farm ABC')."
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason for the movement (e.g., 'illness', 'market ready', 'old age', 'accident')."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The number of animals moved in this event (especially for batch movements)."
+        },
+        "pricePerKg": {
+          "type": "number",
+          "description": "The price per kilogram if the movement was a sale."
+        },
+        "totalRevenue": {
+          "type": "number",
+          "description": "The total revenue generated if the movement was a sale."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the movement event."
+        },
+        "recordedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who recorded the movement event. (Relationship: User 1:N MovementEvent)"
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "entityType",
+        "entityId",
+        "movementDate",
+        "type",
+        "quantity"
+      ]
+    },
+    "InventoryItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "InventoryItem",
+      "type": "object",
+      "description": "Tracks stock levels and details for various consumables and items on the farm (e.g., medications, semen, supplies).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the InventoryItem entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this inventory item belongs to. (Relationship: Farm 1:N InventoryItem)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the inventory item (e.g., 'Antibiotic X', 'Boar Semen Batch A', 'Cleaning Solution')."
+        },
+        "type": {
+          "type": "string",
+          "description": "The category of the inventory item (e.g., medication, semen, supply, other)."
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of measurement for the item (e.g., 'dose', 'bottle', 'kg', 'liter', 'item')."
+        },
+        "currentStock": {
+          "type": "number",
+          "description": "The current quantity of the item in stock."
+        },
+        "minStockLevel": {
+          "type": "number",
+          "description": "The minimum stock level for this item to trigger reorder alerts."
+        },
+        "expirationDate": {
+          "type": "string",
+          "description": "The expiration date of the item, if applicable.",
+          "format": "date-time"
+        },
+        "purchasePricePerUnit": {
+          "type": "number",
+          "description": "The purchase price of a single unit of this item."
+        },
+        "supplier": {
+          "type": "string",
+          "description": "The supplier from whom this item is purchased."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the inventory item."
+        },
+        "batchNumber": {
+          "type": "string",
+          "description": "A specific batch number for tracking inventory items (e.g., for medications or semen)."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "name",
+        "type",
+        "unit",
+        "currentStock"
+      ]
+    },
+    "FinancialTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FinancialTransaction",
+      "type": "object",
+      "description": "Records an economic transaction, either an income or an expense, related to farm operations.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FinancialTransaction entity."
+        },
+        "farmId": {
+          "type": "string",
+          "description": "Reference to the Farm this transaction occurred on. (Relationship: Farm 1:N FinancialTransaction)"
+        },
+        "transactionDate": {
+          "type": "string",
+          "description": "The date and time the transaction occurred.",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of financial transaction (e.g., income, expense)."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the transaction (e.g., feed, medication, labor, animal sale, facility maintenance, vet services, equipment, utility, other)."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The monetary amount of the transaction."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the transaction."
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Optional reference to an entity (Sow, Boar, Pig, Batch, Facility, InventoryItem, or specific Event IDs) if the cost/revenue is directly attributable to it. (Relationship: Generic Entity 1:N FinancialTransaction)"
+        },
+        "recordedByUserId": {
+          "type": "string",
+          "description": "Reference to the User who recorded the financial transaction. (Relationship: User 1:N FinancialTransaction)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the financial transaction."
+        }
+      },
+      "required": [
+        "id",
+        "farmId",
+        "transactionDate",
+        "type",
+        "category",
+        "amount",
+        "description"
+      ]
+    },
+    "Subscription": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subscription",
+      "type": "object",
+      "description": "Tracks user subscription details for access to SmartPig Lite features.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Subscription entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who holds this subscription. (Relationship: User 1:N Subscription)"
+        },
+        "plan": {
+          "type": "string",
+          "description": "The subscription plan (e.g., monthly, biannual, annual)."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date when the subscription started.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date when the subscription is set to end.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the subscription (e.g., active, expired, cancelled, pending)."
+        },
+        "lastPaymentDate": {
+          "type": "string",
+          "description": "The date of the last successful payment.",
+          "format": "date-time"
+        },
+        "nextPaymentDate": {
+          "type": "string",
+          "description": "The date of the next scheduled payment.",
+          "format": "date-time"
+        },
+        "amountPaid": {
+          "type": "number",
+          "description": "The monetary amount paid for the current subscription period."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in which the subscription is paid (e.g., 'USD', 'EUR')."
+        },
+        "paymentGatewayTransactionId": {
+          "type": "string",
+          "description": "An identifier from the payment gateway for the transaction."
+        },
+        "notes": {
+          "type": "string",
+          "description": "General notes or comments about the subscription."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "plan",
+        "startDate",
+        "endDate",
+        "status",
+        "amountPaid",
+        "currency"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores individual user profiles. Each user document contains core identification, authentication details, and a reference to their primary farm (`farmId`). This path leverages path-based ownership for direct user access control. For multi-farm scenarios or roles within a farm, the farm's `members` map is used.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching `request.auth.uid`."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/subscriptions/{subscriptionId}",
+        "definition": {
+          "entityName": "subscription",
+          "schema": {
+            "$ref": "#/backend/entities/Subscription"
+          },
+          "description": "Stores subscription details for a specific user. This subcollection is privately owned by the user, inheriting access control from the parent user document. Access is restricted to `request.auth.uid == userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns the subscription."
+            },
+            {
+              "name": "subscriptionId",
+              "description": "The unique identifier for the subscription."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}",
+        "definition": {
+          "entityName": "farm",
+          "schema": {
+            "$ref": "#/backend/entities/Farm"
+          },
+          "description": "Top-level collection for farm entities. Each document includes `ownerId` (the UID of the primary owner) and a `members` map (`{uid: role}`) for managing multi-user access and roles (admin, veterinarian, operario). This denormalization ensures Authorization Independence and supports QAPs for listing farms accessible to a user by querying the `members` map.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier for the farm."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/sows/{sowId}",
+        "definition": {
+          "entityName": "sow",
+          "schema": {
+            "$ref": "#/backend/entities/Sow"
+          },
+          "description": "Stores records for individual sows belonging to a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this sow belongs to."
+            },
+            {
+              "name": "sowId",
+              "description": "The unique identifier for the sow."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/boars/{boarId}",
+        "definition": {
+          "entityName": "boar",
+          "schema": {
+            "$ref": "#/backend/entities/Boar"
+          },
+          "description": "Stores records for individual boars belonging to a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this boar belongs to."
+            },
+            {
+              "name": "boarId",
+              "description": "The unique identifier for the boar."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/pigs/{pigId}",
+        "definition": {
+          "entityName": "pig",
+          "schema": {
+            "$ref": "#/backend/entities/Pig"
+          },
+          "description": "Stores records for general pigs (piglets, growers, finishers) belonging to a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this pig belongs to."
+            },
+            {
+              "name": "pigId",
+              "description": "The unique identifier for the pig."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/batches/{batchId}",
+        "definition": {
+          "entityName": "batch",
+          "schema": {
+            "$ref": "#/backend/entities/Batch"
+          },
+          "description": "Stores records for batches of pigs belonging to a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this batch belongs to."
+            },
+            {
+              "name": "batchId",
+              "description": "The unique identifier for the batch."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/facilities/{facilityId}",
+        "definition": {
+          "entityName": "facility",
+          "schema": {
+            "$ref": "#/backend/entities/Facility"
+          },
+          "description": "Stores records for facilities (barns, pens) within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this facility belongs to."
+            },
+            {
+              "name": "facilityId",
+              "description": "The unique identifier for the facility."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/matingEvents/{matingEventId}",
+        "definition": {
+          "entityName": "matingEvent",
+          "schema": {
+            "$ref": "#/backend/entities/MatingEvent"
+          },
+          "description": "Stores records of mating events within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this mating event occurred."
+            },
+            {
+              "name": "matingEventId",
+              "description": "The unique identifier for the mating event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/farrowingEvents/{farrowingEventId}",
+        "definition": {
+          "entityName": "farrowingEvent",
+          "schema": {
+            "$ref": "#/backend/entities/FarrowingEvent"
+          },
+          "description": "Stores records of farrowing events within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this farrowing event occurred."
+            },
+            {
+              "name": "farrowingEventId",
+              "description": "The unique identifier for the farrowing event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/weaningEvents/{weaningEventId}",
+        "definition": {
+          "entityName": "weaningEvent",
+          "schema": {
+            "$ref": "#/backend/entities/WeaningEvent"
+          },
+          "description": "Stores records of weaning events within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this weaning event occurred."
+            },
+            {
+              "name": "weaningEventId",
+              "description": "The unique identifier for the weaning event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/healthEvents/{healthEventId}",
+        "definition": {
+          "entityName": "healthEvent",
+          "schema": {
+            "$ref": "#/backend/entities/HealthEvent"
+          },
+          "description": "Stores records of health-related events within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this health event occurred."
+            },
+            {
+              "name": "healthEventId",
+              "description": "The unique identifier for the health event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/feedingEvents/{feedingEventId}",
+        "definition": {
+          "entityName": "feedingEvent",
+          "schema": {
+            "$ref": "#/backend/entities/FeedingEvent"
+          },
+          "description": "Stores records of feeding events within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this feeding event occurred."
+            },
+            {
+              "name": "feedingEventId",
+              "description": "The unique identifier for the feeding event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/feedTypes/{feedTypeId}",
+        "definition": {
+          "entityName": "feedType",
+          "schema": {
+            "$ref": "#/backend/entities/FeedType"
+          },
+          "description": "Stores definitions of feed types available at a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this feed type belongs to."
+            },
+            {
+              "name": "feedTypeId",
+              "description": "The unique identifier for the feed type."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/weightEvents/{weightEventId}",
+        "definition": {
+          "entityName": "weightEvent",
+          "schema": {
+            "$ref": "#/backend/entities/WeightEvent"
+          },
+          "description": "Stores records of weight measurements within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this weight event occurred."
+            },
+            {
+              "name": "weightEventId",
+              "description": "The unique identifier for the weight event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/movementEvents/{movementEventId}",
+        "definition": {
+          "entityName": "movementEvent",
+          "schema": {
+            "$ref": "#/backend/entities/MovementEvent"
+          },
+          "description": "Stores records of animal movement events (transfers, sales, deaths, culling) within a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this movement event occurred."
+            },
+            {
+              "name": "movementEventId",
+              "description": "The unique identifier for the movement event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/inventoryItems/{inventoryItemId}",
+        "definition": {
+          "entityName": "inventoryItem",
+          "schema": {
+            "$ref": "#/backend/entities/InventoryItem"
+          },
+          "description": "Stores records of inventory items (medications, feed, semen, supplies) for a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm this inventory item belongs to."
+            },
+            {
+              "name": "inventoryItemId",
+              "description": "The unique identifier for the inventory item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farms/{farmId}/financialTransactions/{financialTransactionId}",
+        "definition": {
+          "entityName": "financialTransaction",
+          "schema": {
+            "$ref": "#/backend/entities/FinancialTransaction"
+          },
+          "description": "Stores records of financial transactions (income, expenses) for a specific farm. Includes denormalized `farmId` for path validation, and denormalized `ownerId` and `members` map from the parent farm document for Authorization Independence. Security rules check `request.auth.uid` against these denormalized fields without `get()` calls.",
+          "params": [
+            {
+              "name": "farmId",
+              "description": "The unique identifier of the farm where this financial transaction occurred."
+            },
+            {
+              "name": "financialTransactionId",
+              "description": "The unique identifier for the financial transaction."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure for SmartPig Lite prioritizes robust security, scalability, and debuggability by adhering to the core design principles. The primary strategy employed is **Authorization Independence via Denormalization** (Mandate A), which is critical for simplifying security rules and enabling atomic operations.\n\nUser-specific data, such as profiles and subscriptions, is organized under `/users/{userId}`. This follows the **Path-Based Ownership** model (Mandate C1), where `request.auth.uid` directly maps to `userId` in the path, making user data inherently private and secure. Subscriptions are nested under users, following **Hierarchical Paths for User-Owned Data** (Mandate C2).\n\nThe core of the application revolves around farm management. All farm-related entities are organized as subcollections under a top-level `/farms/{farmId}` collection. This structure leverages Firestore's natural hierarchy for efficient querying of farm-specific data.\n\nTo achieve **Authorization Independence (CRITICAL)** and support **QAPs (Rules are not Filters)** for farm-specific data, the following denormalization strategy is applied:\n1.  Each document in the `/farms/{farmId}` collection will include `ownerId` (the UID of the farm's primary owner) and a `members` map (e.g., `{ \"uid1\": \"admin\", \"uid2\": \"veterinario\" }`). This `members` map defines roles for all users associated with that farm, addressing the 'Multiuser management with hierarchical permissions' requirement.\n2.  Every document within *all* subcollections of a farm (e.g., `/farms/{farmId}/sows/{sowId}`, `/farms/{farmId}/batches/{batchId}`, etc.) will denormalize both the `farmId` (already present in the schemas) and the `members` map (or at minimum, the `ownerId` and a flag indicating user membership/role) from its parent `Farm` document. This is **CRITICAL** to avoid `get()` calls in security rules. A security rule for a sow document, for instance, can directly check `request.auth.uid in resource.data.members` and `resource.data.farmId == farmId` without needing to fetch the parent `/farms/{farmId}` document.\n\nThis denormalization directly enables **QAPs** because `list` operations on subcollections can be performed by clients (e.g., `db.collection('farms').doc(farmId).collection('sows')`), and the security rules will implicitly filter access based on the denormalized `members` field in each document, ensuring only authorized users can read the data. For listing farms, clients can query `db.collection('farms').where('members.' + auth.uid, 'exists', true)`.\n\n**Structural Segregation (Mandate B)** is naturally achieved as each collection (e.g., `sows`, `boars`, `batches`) holds documents of a single entity type, ensuring homogeneous security requirements within that collection. The `status` field in many entities (Sow, Boar, Pig, Facility, Subscription) aligns with **Explicit State Modeling** (Mandate D1). Consistent naming conventions and descriptive wildcards are used throughout to ensure **Data Clarity and Predictability** (Mandate D4).\n\nRegarding the user's reported error `get(ref(db, users/${user.uid}/farmInfo))`: this code snippet appears to be for Firebase Realtime Database. In Firestore, a user's primary farm ID is stored in `/users/{userId}.farmId`. The client should first retrieve this `farmId` from their user profile and then query the actual farm details from `/farms/{user.farmId}`. The structure I've provided supports this corrected Firestore interaction, assuming the client-side code will be updated to use Firestore `doc()` and `getDoc()` methods correctly, following the explicit `farmId` reference in the `User` document."
+  }
+}

@@ -1,0 +1,9 @@
+
+# Configuración para Firebase App Hosting
+run:
+  serviceId: smartpig-lite
+  region: us-central1
+  ingress: public
+build:
+  run: npm run build
+nextjs: {}
