@@ -42,13 +42,14 @@ type StatusType = 'Gestante' | 'Vacia' | 'Destetada' | 'Remplazo' | 'Lactante';
 interface Pig {
     id: string;
     breed: string;
-    birthDate: string;
-    arrivalDate: string;
+    birthDate?: string;
+    arrivalDate?: string;
     weight: number;
     gender: string;
     status: StatusType;
     lastEvent: { type: string; date: string; [key: string]: any };
     events: any[];
+    purchaseValue?: number;
 }
 
 const pigBreeds = ["Duroc", "Yorkshire", "Landrace", "Hampshire", "Pietrain", "PIC", "Topigs Norsvin", "Otro"];
@@ -112,9 +113,10 @@ export default function GestationPage() {
       farmId: farmId,
       breed: formData.get('breed') as string,
       gender: formData.get('gender') as string,
-      birthDate: formData.get('birthDate') as string,
-      arrivalDate: formData.get('arrivalDate') as string,
+      birthDate: (formData.get('birthDate') as string) || '',
+      arrivalDate: (formData.get('arrivalDate') as string) || '',
       weight: Number(formData.get('weight')),
+      purchaseValue: formData.get('purchaseValue') ? Number(formData.get('purchaseValue')) : undefined,
       status: editingPig?.status || 'Remplazo',
       members: { [user.uid]: 'owner' },
       lastEvent: editingPig?.lastEvent || { type: 'Ninguno', date: '' },
@@ -276,24 +278,80 @@ export default function GestationPage() {
 
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
             <DialogContent>
-              <DialogHeader><DialogTitle>{editingPig ? 'Editar' : 'Añadir'} Animal</DialogTitle></DialogHeader>
-              <form onSubmit={handleAnimalFormSubmit} className="grid gap-4 py-4">
+              <DialogHeader>
+                <DialogTitle>{editingPig ? 'Editar' : 'Añadir Nueva Hembra'}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleAnimalFormSubmit} className="grid gap-5 py-2">
                 <div className="space-y-2">
-                    <Label htmlFor="id">ID</Label>
-                    <Input id="id" name="id" required defaultValue={editingPig?.id} disabled={!!editingPig} />
+                  <Label>Género *</Label>
+                  <RadioGroup
+                    name="gender"
+                    defaultValue={editingPig?.gender || "Hembra"}
+                    className="grid grid-cols-2 gap-2"
+                  >
+                    <Label
+                      htmlFor="gender-hembra"
+                      className="flex h-10 items-center justify-center rounded-md border bg-background text-sm font-medium data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                    >
+                      <RadioGroupItem id="gender-hembra" value="Hembra" className="sr-only" />
+                      Hembra
+                    </Label>
+                    <Label
+                      htmlFor="gender-macho"
+                      className="flex h-10 items-center justify-center rounded-md border bg-background text-sm font-medium data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                    >
+                      <RadioGroupItem id="gender-macho" value="Macho" className="sr-only" />
+                      Macho
+                    </Label>
+                  </RadioGroup>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="breed">Raza</Label>
-                  <Select name="breed" required defaultValue={editingPig?.breed}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{pigBreeds.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
-                  </Select>
+                  <Label htmlFor="id">ID / Chapeta *</Label>
+                  <Input
+                    id="id"
+                    name="id"
+                    placeholder="Ej: H102"
+                    required
+                    defaultValue={editingPig?.id}
+                    disabled={!!editingPig}
+                  />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>F. Nacimiento</Label><Input name="birthDate" type="date" required defaultValue={editingPig?.birthDate} /></div>
-                    <div className="space-y-2"><Label>Peso (kg)</Label><Input name="weight" type="number" required defaultValue={editingPig?.weight} /></div>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="breed">Raza *</Label>
+                    <Select name="breed" required defaultValue={editingPig?.breed}>
+                      <SelectTrigger id="breed"><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+                      <SelectContent>
+                        {pigBreeds.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="weight">Peso (kg) *</Label>
+                    <Input id="weight" name="weight" type="number" min={0} step="0.1" required defaultValue={editingPig?.weight ?? 0} />
+                  </div>
                 </div>
-                <DialogFooter><Button type="submit">Guardar en Firestore</Button></DialogFooter>
+
+                <div className="space-y-2">
+                  <Label htmlFor="birthDate">Fecha Nacimiento (Opcional)</Label>
+                  <Input id="birthDate" name="birthDate" type="date" defaultValue={editingPig?.birthDate || ''} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="arrivalDate">Fecha Llegada (Opcional)</Label>
+                  <Input id="arrivalDate" name="arrivalDate" type="date" defaultValue={editingPig?.arrivalDate || ''} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="purchaseValue">Valor Compra</Label>
+                  <Input id="purchaseValue" name="purchaseValue" type="number" min={0} step="0.01" defaultValue={editingPig?.purchaseValue ?? 0} />
+                </div>
+
+                <DialogFooter className="pt-2">
+                  <Button type="submit">Guardar en Firestore</Button>
+                </DialogFooter>
               </form>
             </DialogContent>
         </Dialog>
